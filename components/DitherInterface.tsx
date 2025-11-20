@@ -2,6 +2,18 @@
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { ditherImage, FILTERS } from "../utils/dither";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { Label } from "@/components/ui/label";
+import { Card } from "@/components/ui/card";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function DitherInterface() {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
@@ -80,35 +92,39 @@ export default function DitherInterface() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-300 font-mono flex flex-col">
-      <header className="w-full border-b border-neutral-800 bg-neutral-950/80 backdrop-blur-md sticky top-0 z-50">
+    <div className="min-h-screen bg-background text-foreground font-mono flex flex-col">
+      <header className="w-full border-b bg-background backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-baseline gap-4">
-            <h1 className="text-2xl font-semibold text-neutral-100">DITHER</h1>
+            <h1 className="text-2xl font-semibold">DITHER</h1>
           </div>
 
-          <button
-            onClick={downloadImage}
-            disabled={!imageSrc}
-            className="px-6 py-2 bg-neutral-100 text-neutral-950 font-semibold hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm uppercase tracking-wide"
-          >
-            DOWNLOAD
-          </button>
+          <div className="flex items-center gap-4">
+            <ThemeToggle />
+            <Button
+              onClick={downloadImage}
+              disabled={!imageSrc}
+              className="font-semibold uppercase tracking-wide"
+            >
+              DOWNLOAD
+            </Button>
+          </div>
         </div>
       </header>
 
       <main className="flex-1 w-full max-w-5xl mx-auto p-6 flex flex-col gap-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 border border-neutral-800 bg-neutral-900/50">
-          <div className="flex flex-col gap-2">
-            <label className="text-xs uppercase tracking-wider text-neutral-500 font-semibold">
+        <Card className="grid grid-cols-1 md:grid-cols-4 gap-6 p-6 bg-card">
+          <div className="flex flex-col gap-3">
+            <Label className="text-xs uppercase tracking-wider font-semibold text-muted-foreground">
               Source
-            </label>
-            <button
+            </Label>
+            <Button
+              variant="outline"
               onClick={() => fileInputRef.current?.click()}
-              className="w-full py-2 px-3 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-sm text-left transition-colors truncate"
+              className="w-full justify-start truncate"
             >
               {imageSrc ? "Change Image" : "Upload Image"}
-            </button>
+            </Button>
             <input
               ref={fileInputRef}
               type="file"
@@ -117,79 +133,83 @@ export default function DitherInterface() {
               className="hidden"
             />
           </div>
-          <div className="flex flex-col gap-2">
-            <label className="text-xs uppercase tracking-wider text-neutral-500 font-semibold">
+          <div className="flex flex-col gap-3">
+            <Label className="text-xs uppercase tracking-wider font-semibold text-muted-foreground">
               Algorithm
-            </label>
-            <select
+            </Label>
+            <Select
               value={algorithm}
-              onChange={(e) => setAlgorithm(e.target.value as any)}
-              className="w-full bg-neutral-900 border border-neutral-800 p-2 text-sm focus:outline-none focus:border-neutral-600 appearance-none rounded-none"
+              onValueChange={(val: any) => setAlgorithm(val)}
             >
-              <option value="floyd">Floyd-Steinberg</option>
-              <option value="atkinson">Atkinson</option>
-              <option value="stucki">Stucki</option>
-              <option value="burkes">Burkes</option>
-              <option value="sierra">Sierra</option>
-              <option value="jarvis">Jarvis</option>
-              <option value="none">None (Pixelate)</option>
-            </select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select algorithm" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="floyd">Floyd-Steinberg</SelectItem>
+                <SelectItem value="atkinson">Atkinson</SelectItem>
+                <SelectItem value="stucki">Stucki</SelectItem>
+                <SelectItem value="burkes">Burkes</SelectItem>
+                <SelectItem value="sierra">Sierra</SelectItem>
+                <SelectItem value="jarvis">Jarvis</SelectItem>
+                <SelectItem value="none">None (Pixelate)</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          <div className="flex flex-col gap-2">
-            <label className="text-xs uppercase tracking-wider text-neutral-500 font-semibold">
+          <div className="flex flex-col gap-3">
+            <Label className="text-xs uppercase tracking-wider font-semibold text-muted-foreground">
               Filters
-            </label>
-            <select
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-              className="w-full bg-neutral-900 border border-neutral-800 p-2 text-sm focus:outline-none focus:border-neutral-600 appearance-none rounded-none"
-            >
-              {Object.keys(FILTERS).map((p) => (
-                <option key={p} value={p}>
-                  {p.toUpperCase()}
-                </option>
-              ))}
-            </select>
+            </Label>
+            <Select value={filter} onValueChange={(val) => setFilter(val)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select filter" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.keys(FILTERS).map((p) => (
+                  <SelectItem key={p} value={p}>
+                    {p.toUpperCase()}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-          <div className="flex flex-col gap-2">
-            <label className="text-xs uppercase tracking-wider text-neutral-500 font-semibold">
+          <div className="flex flex-col gap-3">
+            <Label className="text-xs uppercase tracking-wider font-semibold text-muted-foreground">
               Pixel Size: {pixelSize}px
-            </label>
-            <div className="flex items-center h-[34px]">
-              <input
-                type="range"
-                min="1"
-                max="5"
-                step="0.25"
-                value={pixelSize}
-                onChange={(e) => setPixelSize(Number(e.target.value))}
-                className="w-full h-1 bg-neutral-800 appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:bg-neutral-400 hover:[&::-webkit-slider-thumb]:bg-neutral-200"
+            </Label>
+            <div className="flex items-center h-10">
+              <Slider
+                min={1}
+                max={5}
+                step={0.25}
+                value={[pixelSize]}
+                onValueChange={(vals) => setPixelSize(vals[0])}
+                className="cursor-pointer"
               />
             </div>
           </div>
-        </div>
+        </Card>
 
-        <div className="flex-1 border border-neutral-800 bg-neutral-900 flex items-center justify-center min-h-[60vh] relative overflow-hidden group">
-          <div className="absolute inset-0 bg-[radial-gradient(#262626_1px,transparent_1px)] [background-size:16px_16px] opacity-20 pointer-events-none"></div>
+        <div className="flex-1 border rounded-lg bg-muted flex items-center justify-center min-h-[60vh] relative overflow-hidden group">
+          <div className="absolute inset-0 bg-[radial-gradient(#000000_1px,transparent_1px)] dark:bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px] opacity-10 pointer-events-none"></div>
 
           {!imageSrc && (
-            <div className="text-neutral-700 text-sm uppercase tracking-widest border border-neutral-800 p-8 border-dashed">
+            <div className="text-muted-foreground text-sm uppercase tracking-widest border border-dashed p-8 rounded-lg">
               No Image Loaded
             </div>
           )}
 
           <div
-            className={`relative max-w-full max-h-full shadow-2xl transition-transform duration-200 ease-out ${!imageSrc ? "hidden" : ""}`}
+            className={`relative max-w-full max-h-full transition-transform duration-200 ease-out ${!imageSrc ? "hidden" : ""}`}
             style={{ transform: `scale(${zoom})` }}
           >
             <canvas
               ref={canvasRef}
-              className="max-w-full h-80 object-contain block"
+              className="max-w-full h-80 object-contain block rounded-sm"
               style={{ imageRendering: "pixelated" }}
             />
             {isProcessing && (
-              <div className="absolute inset-0 bg-neutral-950/50 flex items-center justify-center backdrop-blur-sm">
-                <span className="text-white font-mono text-sm animate-pulse">
+              <div className="absolute inset-0 bg-background flex items-center justify-center backdrop-blur-sm rounded-sm">
+                <span className="font-mono text-sm animate-pulse">
                   PROCESSING...
                 </span>
               </div>
@@ -197,21 +217,25 @@ export default function DitherInterface() {
           </div>
           {imageSrc && (
             <div className="absolute bottom-4 right-4 flex gap-2 z-10">
-              <button
+              <Button
+                variant="secondary"
+                size="icon"
                 onClick={() => setZoom((z) => Math.max(0.1, z - 0.1))}
-                className="w-8 h-8 flex items-center justify-center bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 rounded-full transition-colors"
+                className="h-8 w-8 rounded-full"
               >
                 -
-              </button>
-              <span className="px-2 py-1 bg-neutral-900/80 text-sm font-mono flex items-center rounded border border-neutral-800">
+              </Button>
+              <span className="px-2 py-1 bg-background text-sm font-mono flex items-center rounded border shadow-sm">
                 {Math.round(zoom * 100)}%
               </span>
-              <button
+              <Button
+                variant="secondary"
+                size="icon"
                 onClick={() => setZoom((z) => Math.min(5, z + 0.1))}
-                className="w-8 h-8 flex items-center justify-center bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 rounded-full transition-colors"
+                className="h-8 w-8 rounded-full"
               >
                 +
-              </button>
+              </Button>
             </div>
           )}
         </div>
