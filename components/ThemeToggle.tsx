@@ -13,12 +13,17 @@ import {
 
 export function ThemeToggle() {
   const { setTheme, theme } = useTheme();
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className="w-32 justify-between">
-          <span className="capitalize">{theme || "Theme"}</span>
+          <span className="capitalize">{mounted && theme ? theme : "Theme"}</span>
           <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
