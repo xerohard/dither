@@ -23,7 +23,9 @@ export function ThemeToggle() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className="w-32 justify-between">
-          <span className="capitalize">{mounted && theme ? theme : "Theme"}</span>
+          <span className="capitalize">
+            {mounted && theme ? theme : "Theme"}
+          </span>
           <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
